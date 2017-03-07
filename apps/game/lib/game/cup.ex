@@ -1,6 +1,6 @@
 defmodule Cup do
   @moduledoc """
-  generat a hand of n dices in a cup
+  generat a hand of n dice in a cup
   """
 
   @spec new(integer) :: [integer]
