@@ -4,9 +4,7 @@ defmodule Cup do
   """
 
   @spec new(integer) :: [integer]
-  def new(n, acc \\ [])
-  def new(0, acc), do: acc
-  def new(n, acc) do
-    new(n-1, [:rand.uniform(6) | acc])
+  def new(n) do
+    for _ <- 1..n, do: :rand.uniform(6)
   end
 end
