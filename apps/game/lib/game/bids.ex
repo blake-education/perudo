@@ -1,36 +1,101 @@
 defmodule BidRecord do
   use GenServer
 
+  def start_link
+    GenServer.start_link(__MODULE__, [n, p],  %{name: :bids}) # need to init to make
+  end
+
+  def init(n, p) do
+    default_bid = {0, %{quantity:0, pips:1}}
+    {
+      :ok,
+      {
+        [default_bid],  # list of bids
+        {n, p},         # some way to work out who the next player is - simplify logic here
+        default_bid     # last valid bid - what we should compare with
+      }
+    }
+  end
+
   # LIAR!!!
-  def handle_call({p, :liar}, _from, {bids, bid, n})
-    {:reply, {:end_game}, {[{p, :liar} | bids], nil, n}, :hibernate}
-    # we need to stop the game and do something different here...
+  def handle_call({p, :liar}, _from, {bids, players, last_bid})
+    {
+      :reply,
+      {:end_game},
+      {
+        [{p, :liar} | bids],
+        players,
+        last_bid
+      },
+      :hibernate
+    }
   end
 
   # not your turn
-  def handle_call({p, _new_bid}, _from, {[{q, _old_bid, _status} |bids], n}) when not is_next_player?(p, q, n) do
-    {:reply, {:error, :out_of_turn}, {[{q, _old_bid, _status} |bids], n}, :hibernate}
+  def handle_call({p, _new_bid}, _from, {bids, players, last_bid}) when not is_next_player?(p, players) do
+    {
+      :reply,
+      {
+        :error,
+        :out_of_turn
+      },
+      {
+        bids,
+        players,
+        last_bid
+      },
+      :hibernate
+    }
   end
 
   # next player times out
-  def handle_call({p, :timeout}, _from, bids)
-    {_p, bid, _status} = hd(bids)
-    {:reply, {:ok, {:new_bid, bid}}, {[{p, bid, :timeout} | bids], n}, :hibernate}
+  def handle_call({p, :timeout}, _from, {bids, players, last_bid})
+    {
+      :reply,
+      {
+        :ok,
+        {:timeout, last_bid}
+      },
+      {
+        bids |> List.insert_at(0, {p, :timeout}),
+        players |> next_player,
+        last_bid
+      },
+      :hibernate
+    }
   end
 
-  def handle_call({_p, new_bid}, _from, {[{_q, old_bid} |bids], n}) when not is_a_higher_bid?(new_bid, old_bid) do
-    {:reply, {:error, {:bid_too_low, old_bid}}, {[{_q, old_bid} |bids], n}, :hibernate}
+  # bid too low
+  def handle_call({_p, new_bid}, _from, {bids, players, last_bid}) when not is_a_higher_bid?(new_bid, last_bid) do
+    {
+      :reply,
+      {
+        :error,
+        {:bid_too_low, last_bid}
+      },
+      {
+        bids,
+        players,
+        last_bid
+      }
+    }
   end
 
-  def handle_call({p, new_bid}, _from, {[{q, old_bid} |bids], n}) do
-    {:reply, {:ok, {:new_bid, new_bid}}, :hibernate}
+  # valid bid form valid player.
+  def handle_call({p, new_bid}, _from, {bids, players, last_bid}) do
+    {
+      :reply,
+      {:ok,
+        {:good_bid, new_bid}
+      },
+      {
+        bids |> List.insert_at(0, {p, new_bid}),
+        players |> next_player,
+        new_bid
+      },
+      :hibernate
+    }
   end
-
-
-  def
-
-  start_link(BidRecord, [n, p],  %{name: :bids}) # need to init to make
-
 
   # defp is_next_player(new_player, old_player, number_of_players)
   defmacro is_next_player?(q, p, n), do: true
@@ -46,10 +111,6 @@ defmodule BidRecord do
     end
   end
 
-  defp old_bid([{_p, bid, _status} | bids]) do
-    bid
-  end
-
-
-
+  def next_player({n, n}), do: {n, 1}
+  def next_player({n, p}), do: {n, p+1}
 end
