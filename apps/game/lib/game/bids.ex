@@ -1,12 +1,12 @@
 defmodule BidRecord do
   use GenServer
 
-  def start_link
+  def start_link do
     GenServer.start_link(__MODULE__, [n, p],  %{name: :bids}) # need to init to make
   end
 
   def init(n, p) do
-    default_bid = {0, %{quantity:0, pips:1}}
+    default_bid = {0, %{quantity: 0, pips: 1}}
     {
       :ok,
       {
@@ -17,8 +17,26 @@ defmodule BidRecord do
     }
   end
 
-  # LIAR!!!
-  def handle_call({p, :liar}, _from, {bids, players, last_bid})
+  def handle_call(bid, _from, state) do
+    {bids, players, last_bid} = state
+    player = elem(bid, 0)
+    cond do
+      bid =~ {player, :liar}
+        -> liar(bid, state)
+      not is_next_player?(player, players)
+        -> out_of_turn(bid, state)
+      bid =~ {player, :timeout}
+        -> timeout(bid, state)
+      not valid_bid(bid, last_bid)
+        -> invalid_bid(bid, state)
+      valid_bid(bid, last_bid)
+        -> valid_bid(bid, state)
+      true
+        -> {:error, :bad_message}
+    end
+  end
+
+  defp liar({p, :liar}, {bids, players, last_bid}) do
     {
       :reply,
       {:end_game},
@@ -31,8 +49,7 @@ defmodule BidRecord do
     }
   end
 
-  # not your turn
-  def handle_call({p, _new_bid}, _from, {bids, players, last_bid}) when not is_next_player?(p, players) do
+  defp out_of_turn({p, _new_bid}, {bids, players, last_bid}) do
     {
       :reply,
       {
@@ -48,8 +65,9 @@ defmodule BidRecord do
     }
   end
 
-  # next player times out
-  def handle_call({p, :timeout}, _from, {bids, players, last_bid})
+  defp function_name do
+
+  end timeout({p, :timeout}, {bids, players, last_bid}) do
     {
       :reply,
       {
@@ -65,13 +83,12 @@ defmodule BidRecord do
     }
   end
 
-  # bid too low
-  def handle_call({_p, new_bid}, _from, {bids, players, last_bid}) when not is_a_higher_bid?(new_bid, last_bid) do
+  defp invalid_bid({_p, new_bid}, {bids, players, last_bid}) do
     {
       :reply,
       {
         :error,
-        {:bid_too_low, last_bid}
+        {:bid_too_low, new_bid, last_bid}
       },
       {
         bids,
@@ -81,8 +98,7 @@ defmodule BidRecord do
     }
   end
 
-  # valid bid form valid player.
-  def handle_call({p, new_bid}, _from, {bids, players, last_bid}) do
+  defp valid_bid({p, new_bid}, {bids, players, _last_bid}) do
     {
       :reply,
       {:ok,
@@ -97,20 +113,15 @@ defmodule BidRecord do
     }
   end
 
-  # defp is_next_player(new_player, old_player, number_of_players)
-  defmacro is_next_player?(q, p, n), do: true
-    quote do
-      (unquote(q) == unquote(p) + 1) || ((unquote(p) == unquote(n)) && (unquote(q) == 1))
-    end
+  defp valid_bid?(%{quantity: q1, pips: p1}, %{quantity: q2, pips: p2}) do
+    (p1 <= 6) && ((q1 > q2) || ((q1 == q2) && (p1 > p2)))
   end
 
-  #defp is_a_higher_bid(old_bid, new_bid)
-  defmacro is_a_higher_bid?(%{quantity: q1, pips: p1}, %{quantity: q2, pips: p2}) do
-    quote do
-      (unquote(q1) > unquote(q2)) || ((unquote(q1) == unquote(q2)) && (unquote(p1) > unquote(p2)))
-    end
-  end
+  def is_next_player?(1, {n, n}), do: true
+  def is_next_player?(_, {n, n}), do: false
+  def is_next_player?(p + 1, {_, p}), do: true
+  def is_next_player?(_, _), do: false
 
   def next_player({n, n}), do: {n, 1}
-  def next_player({n, p}), do: {n, p+1}
+  def next_player({n, p}), do: {n, p + 1}
 end
