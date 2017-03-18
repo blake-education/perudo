@@ -23,5 +23,4 @@ defmodule Game do
     opts = [strategy: :one_for_one, name: Game.Supervisor]
     Supervisor.start_link(children, opts)
   end
-
 end
