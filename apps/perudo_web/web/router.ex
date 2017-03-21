@@ -19,6 +19,7 @@ defmodule PerudoWeb.Router do
 
     get "/", PageController, :index
     resources "/users", UserController, except: [:delete]
+    resources "/sessions", SessionController, only: [:new, :create, :delete]
   end
 
   # Other scopes may use custom stacks.
