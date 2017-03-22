@@ -40,7 +40,7 @@ defmodule PerudoWeb.Auth do
     configure_session(conn, drop: true)
   end
 
-  import PhoenixWeb.Controller
+  import Phoenix.Controller
   alias PerudoWeb.Router.Helpers
 
   def authenticate_user(conn, _opts) do
