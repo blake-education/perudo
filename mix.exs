@@ -21,6 +21,9 @@ defmodule Perudo.Mixfile do
   # Dependencies listed here are available only for this project
   # and cannot be accessed from applications inside the apps folder
   defp deps do
-    []
+    [
+      {:credo, "~> 0.5", only: [:dev, :test]},
+      {:mix_test_watch, "~> 0.3", only: :dev, runtime: false},
+    ]
   end
 end
