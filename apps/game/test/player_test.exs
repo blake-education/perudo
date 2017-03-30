@@ -16,28 +16,28 @@ defmodule Game.PlayerTest do
 
   test "can return a player's state" do
     Player.start_link(1)
-    assert Player.state(1) ==
-      %{
-        id: 1,
-        name: "Player 1",
-        cup: []
-      }
+    assert %{
+      id: 1,
+      name: "Player 1",
+      number_of_dice: 5,
+      cup: [_, _, _, _, _],
+    } = Player.state(1)
   end
 
   test "can count dice in hand" do
     Player.start_link(1)
-    assert Player.dice_count(1) == 0
+    assert Player.dice_count(1) == 5
   end
 
-  # test "has a count of players" do
-  #   Game.Player.start_link(1)
-  #   assert Game.Player.player_count(1) == 0
-  # end
+  test "can count the number of dice for pips" do
+    reply = Player.handle_call({:count_for, 2}, nil, %{cup: [2, 1, 2, 1, 5]})
+    assert reply = {:reply, 4, %{cup: [2, 1, 2, 1, 5]}}
+  end
 
-  # test "can add a player" do
-  #   Game.Player.start_link(1)
-  #   assert Game.Player.player_count(1) == 0
-  #   Game.Player.add_player(1, :bill)
-  #   assert Game.Player.player_count(1) == 1
-  # end
+  test "can deduct a dice" do
+    Player.start_link(1)
+    assert Player.dice_count(1) == 5
+    Player.deduct_dice(1)
+    assert Player.dice_count(1) == 4
+  end
 end
