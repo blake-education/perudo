@@ -12,5 +12,4 @@ defmodule Cup do
   def count_for(pips, dice) do
     Enum.count(dice, fn(p) -> p == 1 or p == pips end)
   end
-
 end
