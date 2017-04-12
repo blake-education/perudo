@@ -36,6 +36,7 @@ defmodule PerudoWeb.Web do
 
       import PerudoWeb.Router.Helpers
       import PerudoWeb.Gettext
+      import PerudoWeb.Auth, only: [authenticate_user: 2]
     end
   end
 
@@ -69,6 +70,7 @@ defmodule PerudoWeb.Web do
       import Ecto
       import Ecto.Query
       import PerudoWeb.Gettext
+      import PerudoWeb.Auth, only: [authenticate_user: 2]
     end
   end
 

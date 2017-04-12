@@ -21,6 +21,7 @@ defmodule PerudoWeb.ModelCase do
       import Ecto
       import Ecto.Changeset
       import Ecto.Query
+      import PerudoWeb.TestHelpers
       import PerudoWeb.ModelCase
     end
   end

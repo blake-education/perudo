@@ -26,6 +26,7 @@ defmodule PerudoWeb.ConnCase do
       import Ecto.Query
 
       import PerudoWeb.Router.Helpers
+      import PerudoWeb.TestHelpers
 
       # The default endpoint for testing
       @endpoint PerudoWeb.Endpoint
