@@ -1,5 +1,7 @@
 defmodule Game.Player do
 
+  alias Game.Cup
+
   @moduledoc """
   This module holds the state for a player of a game
   """

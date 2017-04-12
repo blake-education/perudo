@@ -1,5 +1,6 @@
 defmodule CupTest do
   use ExUnit.Case
+  alias Game.Cup
 
   test "cup has desired dice count" do
     [1, 2, 3, 4, 5]
