@@ -18,12 +18,21 @@ defmodule Game.Table do
     GenServer.call(via_tuple(id), {:add_player, id})
   end
 
+  def get_dice(id) do
+    GenServer.call(via_tuple(id), :get_dice)
+  end
+
+  def get_current_bid(id) do
+    GenServer.call(via_tuple(id), :get_current_bid)
+  end
+
   def init(id) do
     {
       :ok,
       %{
         name: id,
-        players: []
+        players: [],
+        current_bid: %Game.Bid{}
       }
     }
   end
@@ -37,5 +46,18 @@ defmodule Game.Table do
       state | players: [player_id] ++ state.players
     }
     {:reply, new_state.players, new_state}
+  end
+
+  def handle_call(:get_dice, _from, state) do
+    all_dice =
+      state.players
+      |> Enum.flat_map(fn(player) ->
+        Game.Player.get_dice(player)
+      end)
+    {:reply, all_dice, state}
+  end
+
+  def handle_call(:get_current_bid, _from, state) do
+    {:reply, state.current_bid, state}
   end
 end

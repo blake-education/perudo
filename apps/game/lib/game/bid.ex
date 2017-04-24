@@ -1,7 +1,6 @@
 defmodule Game.Bid do
 
-  defstruct dice_count: 1, face_value: 2
-
+  defstruct dice_count: 0, face_value: 2
   alias Game.Bid
 
   @spec valid?(%Bid{}, %Bid{}, integer) :: boolean

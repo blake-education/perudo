@@ -17,7 +17,7 @@ defmodule Game.Mixfile do
   def application do
     [
       applications: [:logger],
-      mod: {Game, []}
+      mod: {Game.Application, []}
     ]
   end
 

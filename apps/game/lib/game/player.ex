@@ -34,6 +34,8 @@ defmodule Game.Player do
     GenServer.call(via_tuple(id), :deduct_dice)
   end
 
+  def get_dice(id), do: GenServer.call(via_tuple(id), :get_dice)
+
   # def find_or_creeate(id) do
   #   case Registry.lookup(:player_registry, id) do
   #     [] -> Game.Player.start_link(id)
@@ -69,5 +71,9 @@ defmodule Game.Player do
     new_state =
       %{ state | number_of_dice: state.number_of_dice - 1}
     {:reply, new_state, new_state}
+  end
+
+  def handle_call(:get_dice, _from, state) do
+    {:reply, state.cup, state}
   end
 end

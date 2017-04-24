@@ -23,4 +23,15 @@ defmodule Game.TableTest do
     Game.Table.add_player(1, :bill)
     assert Game.Table.player_count(1) == 1
   end
+
+  test "gets dice" do
+    assert true
+  end
+
+  test "gets current bid" do
+
+
+
+
+  end
 end
