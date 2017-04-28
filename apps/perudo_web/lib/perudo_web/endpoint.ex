@@ -1,7 +1,7 @@
 defmodule PerudoWeb.Endpoint do
   use Phoenix.Endpoint, otp_app: :perudo_web
 
-  socket "/socket", PerudoWeb.UserSocket
+  socket "/socket", PerudoWeb.GameSocket
 
   # Serve at "/" the static files from "priv/static" directory.
   #
