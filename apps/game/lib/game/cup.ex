@@ -1,4 +1,4 @@
-defmodule Cup do
+defmodule Game.Cup do
   @moduledoc """
   generat a hand of n dice in a cup
   """

@@ -40,4 +40,9 @@ defmodule Game.PlayerTest do
     Player.deduct_dice(1)
     assert Player.dice_count(1) == 4
   end
+
+  test "returns the dice" do
+    reply = Player.handle_call(:get_dice, nil, %{cup: [2, 1, 2, 1, 5]})
+    assert reply = {:reply, [2, 1, 2, 1, 5], %{cup: [2, 1, 2, 1, 5]}}
+  end
 end

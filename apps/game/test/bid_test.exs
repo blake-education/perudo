@@ -31,7 +31,7 @@ defmodule Game.BidTest do
   end
 
   test "is valid with increased face_value" do
-    assert Bid.valid?(%Bid{face_value: 3}, %Bid{face_value: 2}, 5)
+    assert Bid.valid?(%Bid{face_value: 3, dice_count: 5}, %Bid{face_value: 2, dice_count: 5}, 5)
   end
 
   test "is valid with increased dice_count" do

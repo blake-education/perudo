@@ -19,9 +19,17 @@ defmodule Game.Table do
   end
 
   def add_player(id, player_id) do
-    GenServer.call(via_tuple(id), {:add_player, player_id})
+    GenServer.call(via_tuple(id), {:add_player, id})
   end
 
+  def get_dice(id) do
+    GenServer.call(via_tuple(id), :get_dice)
+  end
+
+  def get_current_bid(id) do
+    GenServer.call(via_tuple(id), :get_current_bid)
+  end
+  
   def find_or_create(id) do
     IO.inspect Registry.lookup(:table_registry, id)
     if Registry.lookup(:table_registry, id) == [] do
@@ -35,7 +43,8 @@ defmodule Game.Table do
       :ok,
       %{
         name: id,
-        players: []
+        players: [],
+        current_bid: %Game.Bid{}
       }
     }
   end
@@ -52,7 +61,19 @@ defmodule Game.Table do
     new_state = %{
       state | players: [player_id] ++ state.players
     }
-    IO.inspect new_state
     {:reply, new_state.players, new_state}
+  end
+
+  def handle_call(:get_dice, _from, state) do
+    all_dice =
+      state.players
+      |> Enum.flat_map(fn(player) ->
+        Game.Player.get_dice(player)
+      end)
+    {:reply, all_dice, state}
+  end
+
+  def handle_call(:get_current_bid, _from, state) do
+    {:reply, state.current_bid, state}
   end
 end
