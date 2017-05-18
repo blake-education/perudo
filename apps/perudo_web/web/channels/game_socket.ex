@@ -1,8 +1,8 @@
-defmodule PerudoWeb.UserSocket do
+defmodule PerudoWeb.GameSocket do
   use Phoenix.Socket
 
   ## Channels
-  # channel "room:*", PerudoWeb.RoomChannel
+  channel "table:*", PerudoWeb.TableChannel
 
   ## Transports
   transport :websocket, Phoenix.Transports.WebSocket
