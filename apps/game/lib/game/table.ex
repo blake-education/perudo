@@ -10,6 +10,10 @@ defmodule Game.Table do
     {:via, Registry, {:table_registry, id}}
   end
 
+  def state(id) do
+    GenServer.call(via_tuple(id), :state)
+  end
+
   def player_count(id) do
     GenServer.call(via_tuple(id), :player_count)
   end
@@ -25,6 +29,14 @@ defmodule Game.Table do
   def get_current_bid(id) do
     GenServer.call(via_tuple(id), :get_current_bid)
   end
+  
+  def find_or_create(id) do
+    IO.inspect Registry.lookup(:table_registry, id)
+    if Registry.lookup(:table_registry, id) == [] do
+      Game.Table.start_link(id)
+    end
+    id
+  end
 
   def init(id) do
     {
@@ -35,6 +47,10 @@ defmodule Game.Table do
         current_bid: %Game.Bid{}
       }
     }
+  end
+
+  def handle_call(:state, _from, state) do
+    {:reply, state, state}
   end
 
   def handle_call(:player_count, _from, state) do
