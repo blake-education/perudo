@@ -3,6 +3,7 @@ defmodule Game.Table do
   use GenServer
 
   def start_link(id) do
+    IO.inspect "Game.Table.start_link #{id}"
     GenServer.start_link(__MODULE__, id, name: via_tuple(id))
   end
 
@@ -19,7 +20,7 @@ defmodule Game.Table do
   end
 
   def add_player(id, player_id) do
-    GenServer.call(via_tuple(id), {:add_player, id})
+    GenServer.call(via_tuple(id), {:add_player, player_id})
   end
 
   def get_dice(id) do
@@ -29,13 +30,9 @@ defmodule Game.Table do
   def get_current_bid(id) do
     GenServer.call(via_tuple(id), :get_current_bid)
   end
-  
-  def find_or_create(id) do
-    IO.inspect Registry.lookup(:table_registry, id)
-    if Registry.lookup(:table_registry, id) == [] do
-      Game.Table.start_link(id)
-    end
-    id
+
+  def round_state(id) do
+    GenServer.call(via_tuple(id), :round_state)
   end
 
   def init(id) do
@@ -58,6 +55,7 @@ defmodule Game.Table do
   end
 
   def handle_call({:add_player, player_id}, _from, state) do
+    Game.Player.start_link(player_id)
     new_state = %{
       state | players: [player_id] ++ state.players
     }
@@ -75,5 +73,24 @@ defmodule Game.Table do
 
   def handle_call(:get_current_bid, _from, state) do
     {:reply, state.current_bid, state}
+  end
+
+  def handle_call(:round_state, _from, state) do
+    round = %{
+      name: state.name,
+      current_bid: state.current_bid,
+      players: players(state.players),
+    }
+    {:reply, round, state}
+  end
+
+  defp players(ids) do
+    ids
+    |> Enum.map(fn(player_id) ->
+      %{
+        id: player_id,
+        dice_count: Game.Player.dice_count(player_id)
+      }
+    end)
   end
 end

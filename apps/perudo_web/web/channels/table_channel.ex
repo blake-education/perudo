@@ -13,7 +13,7 @@ defmodule PerudoWeb.TableChannel do
   end
 
   def handle_info(:after_join, socket) do
-    data = Game.table_state(socket.assigns.table_id)
+    data = Game.Table.round_state(socket.assigns.table_id)
     push(socket, "state", data)
     {:noreply, socket}
   end

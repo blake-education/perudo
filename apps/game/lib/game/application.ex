@@ -14,9 +14,9 @@ defmodule Game.Application do
     children = [
       # Starts a worker by calling: Dossier.Worker.start_link(arg1, arg2, arg3)
       supervisor(Registry, [:unique, :table_registry]),
-      supervisor(Registry, [:unique, :player_registry], id: make_ref())
+      supervisor(Registry, [:unique, :player_registry], id: make_ref()),
+      supervisor(Game.TableSupervisor, [])
       # worker(Game.Worker, [arg1, arg2, arg3]),
-      # supervisor(Game.Repo, [])
     ]
 
     # See http://elixir-lang.org/docs/stable/elixir/Supervisor.html

@@ -1,8 +1,11 @@
 defmodule Game do
-  alias Game.Table
+  alias Game.{Table, TableSupervisor}
 
   def join_table do
-    Table.find_or_create(1)
+    if Registry.lookup(:table_registry, 1) == [] do
+      TableSupervisor.create_table(1)
+    end
+    1
   end
 
   def table_state(id) do
